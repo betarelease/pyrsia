@@ -15,7 +15,7 @@ jobs:
         matrix:
             os: [macos-latest, ubuntu-latest]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions/cache@v2
       with:
         path: |
@@ -100,7 +100,7 @@ jobs:
 
       # Checkout Synapse
       - name: Checkout Synapse
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: pyrsia/synapse
 
@@ -149,7 +149,7 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     - uses: actions/cache@v2
@@ -184,7 +184,7 @@ jobs:
     needs: [build, synapse-package]
     if: github.repository_owner == 'pyrsia' && github.event_name == 'push'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 2
 
