@@ -150,7 +150,7 @@ fn setup_pyrsia_services(
     let artifact_path = PathBuf::from(ARTIFACTS_DIR.as_str());
     let (build_event_sender, build_event_receiver) = mpsc::channel(32);
 
-    debug!("Create artifact service");
+    debug!("Create artifact service: ARTIFACTS_DIR = {}", artifact_path.display());
     let artifact_service =
         setup_artifact_service(&artifact_path, build_event_sender.clone(), p2p_client)?;
 
