@@ -170,7 +170,7 @@ jobs:
           "$WIX_PATH_LIGHT" -ext WixUIExtension -ext WixUtilExtension installerps1.wixobj -out pyrsia_service.msi
           cd ../..
 
-      # for now, upload installers
+      # for now, upload installers to github
       - name: Upload Installer
         uses: actions/upload-artifact@v3
         with:
@@ -182,6 +182,37 @@ jobs:
         with:
           name: windows-installer-with-service
           path: ${{ github.workspace }}/installers/windows/pyrsia_service.msi
+
+      # for now, upload installers to gcs
+      - id: build-windows-setup-cloud-sdk
+        name: Set up Cloud SDK
+        if: github.repository_owner == 'pyrsia' && (github.event_name == 'push' || github.event_name == 'release')
+        uses: 'google-github-actions/setup-gcloud@v1'
+
+      - id: build-windows-install-crcmod-gsutil-version-info
+        name: 'Install crcmod and gsutil version info'
+        if: github.repository_owner == 'pyrsia' && (github.event_name == 'push' || github.event_name == 'release')
+        run: |
+          pip3 install -U crcmod
+          gsutil version -l
+          gcloud info
+        shell: /bin/zsh -e {0}
+
+      # Publish nightly version of installer archive to cloud bucket
+      - id: build-windows-publish-nightly-gcs-repo
+        name: Publish Build to NIGHTLY GCS repo
+        if: github.repository_owner == 'pyrsia' && (github.event_name == 'push' || github.event_name == 'release')
+        run: |
+          .github/workflows/windows-installer-upload.sh ${{ github.workspace }}/installers/windows/ ${{ steps.add-fqbvn-and-export.outputs.TAG_NAME }} latest x86_64
+        shell: /bin/zsh -e {0}
+
+      # Publish stable version of installer archive to cloud bucket
+      - id: build-windows-publish-stable-gcs-repo
+        name: Publish Release to STABLE GCS repo
+        if: github.repository_owner == 'pyrsia' && github.event_name == 'release'
+        run: |
+          .github/workflows/windows-installer-upload.sh ${{ github.workspace }}/installers/windows/ ${{ steps.add-fqbvn-and-export.outputs.TAG_NAME }} stable x86_64
+        shell: /bin/zsh -e {0}
 
   build-push-linux:
     permissions:
