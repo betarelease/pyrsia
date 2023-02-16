@@ -116,6 +116,9 @@ jobs:
 
   # Windows Build Job
   build-windows:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     runs-on: windows-2022
     env:
       RUSTC_WRAPPER: C:\Users\runneradmin\.cargo\bin\sccache.exe
@@ -170,7 +173,7 @@ jobs:
           "$WIX_PATH_LIGHT" -ext WixUIExtension -ext WixUtilExtension installerps1.wixobj -out pyrsia_service.msi
           cd ../..
 
-      # for now, upload installers
+      # for now, upload installers to github
       - name: Upload Installer
         uses: actions/upload-artifact@v3
         with:
@@ -182,6 +185,14 @@ jobs:
         with:
           name: windows-installer-with-service
           path: ${{ github.workspace }}/installers/windows/pyrsia_service.msi
+
+  publish-msi:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: .github/workflows/publish-installers.yml@main
 
   build-push-linux:
     permissions:
